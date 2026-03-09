@@ -3,7 +3,7 @@
 #include <string>
 #include <iterator>
 
-int main() {
+void decomp_test() {
     std::vector<float> a = {1, 7, 5};
     std::vector<float> b = {1, 8};
     std::vector<float> c = {2, 3};
@@ -16,5 +16,9 @@ int main() {
     std::cout << "Expected: {1.0, 5.0, 0.2}" << std::endl;
     std::copy(LU.upper.begin(), LU.upper.end(), std::ostream_iterator<float>(std::cout, " "));
     std::cout << std::endl;
-    return 0;
+}
+
+
+int main() {
+    decomp_test();
 }
