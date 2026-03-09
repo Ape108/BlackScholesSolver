@@ -35,3 +35,11 @@ into a lower diagonal matrix and an upper diagonal matrix:
 
 */
 
+// Struct to hold the values of L and U. 
+struct Decomposed {
+    std::vector<float> lower;
+    std::vector<float> upper;
+};
+
+Decomposed Decomp(const std::vector<float>& a, const std::vector<float>& b, const std::vector<float>& c);
+
