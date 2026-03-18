@@ -11,5 +11,5 @@ TEST(ForwardSubTest, BasicAssertions) {
 
     EXPECT_NEAR(y[0], 6.0f, 1e-6);
     EXPECT_NEAR(y[1],-3.0f, 1e-6);
-    EXPECT_NEAR(y[2],(39.0/5.0), 1e-6);
+    EXPECT_NEAR(y[2], 7.8f, 1e-6);
 }

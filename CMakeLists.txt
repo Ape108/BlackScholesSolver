@@ -17,7 +17,7 @@ FetchContent_MakeAvailable(googletest)
 enable_testing()
 
 # Create a library with all source files
-add_library(solver_lib src/lower_upper.cpp src/forward_sub.cpp)
+add_library(solver_lib src/lower_upper.cpp src/forward_sub.cpp src/back_sub.cpp)
 target_include_directories(solver_lib PUBLIC include)
 
 # Create a single unified test executable with all test files
@@ -25,6 +25,7 @@ add_executable(
   all_tests
   tests/decomp_tests.cpp
   tests/forward_sub_tests.cpp
+  tests/back_sub_tests.cpp
 )
 target_link_libraries(
   all_tests
