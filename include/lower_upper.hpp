@@ -1,7 +1,3 @@
-#pragma once
-
-#include <vector>
-
 /*
 Given a Tridagonal Matrix A of shape n X n, where: 
 
@@ -35,11 +31,21 @@ into a lower diagonal matrix and an upper diagonal matrix:
 
 */
 
+#pragma once
+
+#include <vector>
+
+
 // Struct to hold the values of L and U. 
 struct Decomposed {
     std::vector<float> lower;
     std::vector<float> upper;
 };
 
-Decomposed Decomp(const std::vector<float>& a, const std::vector<float>& b, const std::vector<float>& c);
+/// @brief Performs LU decomposition on a tridiagonal matrix.
+/// @param a Flattened input matrix main-diagonal values
+/// @param b Flattened input matrix upper-diagonal values
+/// @param c Flattened input matrix lower-diagonal values
+/// @return A 'Decomposed' struct containing an upper and lower matrix
+Decomposed lu_decomposition(const std::vector<float>& a, const std::vector<float>& b, const std::vector<float>& c);
 

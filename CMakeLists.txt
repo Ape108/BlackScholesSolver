@@ -16,18 +16,21 @@ FetchContent_MakeAvailable(googletest)
 
 enable_testing()
 
-add_library(lower_upper_lib src/lower_upper.cpp)
-target_include_directories(lower_upper_lib PUBLIC include)
+# Create a library with all source files
+add_library(solver_lib src/lower_upper.cpp src/forward_sub.cpp)
+target_include_directories(solver_lib PUBLIC include)
 
+# Create a single unified test executable with all test files
 add_executable(
-  decomp_tests
+  all_tests
   tests/decomp_tests.cpp
+  tests/forward_sub_tests.cpp
 )
 target_link_libraries(
-  decomp_tests
-  lower_upper_lib
+  all_tests
+  solver_lib
   GTest::gtest_main
 )
 
 include(GoogleTest)
-gtest_discover_tests(decomp_tests)
+gtest_discover_tests(all_tests)
