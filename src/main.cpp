@@ -5,26 +5,33 @@
 #include <iostream>
 #include <iomanip>
 
+struct TridiagonalMatrix {
+    std::vector<float> main_diag;
+    std::vector<float> upper_diag;
+    std::vector<float> lower_diag;
+};
 
 int main() {
 
-    // Matrix A
-    std::vector<float> a = {1, 7, 5};
-    std::vector<float> b = {1, 8};
-    std::vector<float> c = {2, 3};
-    
+    // A = [1 1 0]
+    //     [2 7 8]
+    //     [0 3 5]
+    TridiagonalMatrix A{{1, 7, 5}, {1, 8}, {2, 3}};
+
     // Right-hand side
     std::vector<float> rhs = {6.0, 9.0, 6.0};
 
-    Decomposed LU = lu_decomposition(a, b, c);
+    Decomposed LU_matrices = lu_decomposition(A.main_diag, A.upper_diag, A.lower_diag);
 
-    std::vector<float> l = LU.lower;
-    std::vector<float> y = forward_substitution(l, rhs);
+    std::vector<float> lower_matrix = LU_matrices.lower;
+    std::vector<float> y = forward_substitution(lower_matrix, rhs); // Solution Vector Ly = rhs
 
-    std::vector<float> u = LU.upper;
-    std::vector<float> x = backward_substitution(u, b, y);
+    std::vector<float> upper_matrix = LU_matrices.upper;
+    std::vector<float> x = backward_substitution(upper_matrix, A.upper_diag, y); // Solution Vector Ux = y
 
-    std::cout << std::fixed << std::setprecision(2) << x[0] << " " << x[1] << " " << x[2] << std::endl;
+    std::cout << std::fixed << std::setprecision(2) << x[0] << std::endl;
+    std::cout << std::fixed << std::setprecision(2) << x[1] << std::endl;
+    std::cout << std::fixed << std::setprecision(2) << x[2] << std::endl;
 
     return 0;
 }
