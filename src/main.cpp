@@ -38,18 +38,13 @@ void print_vector(const std::vector<T>& vec) {
 }
 
 int main() {
-
     // A = [1 1 0]
     //     [2 7 8]
     //     [0 3 5]
     TridiagonalMatrix A{{1, 7, 5}, {1, 8}, {2, 3}};
+    std::vector<float> rhs = {6.0, 9.0, 6.0}; // Right-hand side
 
-    // Right-hand side
-    std::vector<float> rhs = {6.0, 9.0, 6.0};
-
-    // Solution Vector
-    std::vector<float> x = thomas_algorithm(A, rhs);
-
+    std::vector<float> x = thomas_algorithm(A, rhs); // Solution Vector
     print_vector(x);
 
     return 0;
