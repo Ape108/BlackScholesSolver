@@ -3,9 +3,10 @@ An implementation of the Thomas Algorithm for efficiently solving Tridiagonal Li
 
 ## Works Cited
 
-Crank-Nicolson & Black Scholes:
+Crank-Nicolson & Black Scholes:<br>
 https://antonismolski.medium.com/crank-nicholson-with-black-scholes-with-code-a27c0df17555
 
-Thomas Algorithm:
+Thomas Algorithm:<br>
 https://www.youtube.com/watch?v=vzqwV-REmkw
+
 
