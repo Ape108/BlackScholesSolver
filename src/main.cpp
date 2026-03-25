@@ -48,7 +48,7 @@ int main() {
     }
 
     std::cout << std::endl;
-    std::map<std::string, std::string> params = data_loader(file);
+    std::map<std::string, std::string> params = data_loader(file, true);
     std::cout << std::endl;
 
     file.close();

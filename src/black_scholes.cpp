@@ -1,7 +1,7 @@
 #include "black_scholes.hpp"
 #include <stdexcept>
 
-std::map<std::string, std::string> data_loader(std::ifstream &file) {
+std::map<std::string, std::string> data_loader(std::ifstream &file, const bool& print=false) {
     
     std::string line;
     std::vector<std::vector<std::string>> rows;
@@ -28,10 +28,18 @@ std::map<std::string, std::string> data_loader(std::ifstream &file) {
     }
 
     std::map<std::string, std::string> params;
-    for (size_t i=0; i<header.size(); i++) {
-        params[header[i]] = values[i];
-        std::cout << header[i] << ":  " << values[i] << std::endl;
+
+    if (print) {
+        for (size_t i=0; i<header.size(); i++) {
+            params[header[i]] = values[i];
+            std::cout << header[i] << ":  " << values[i] << std::endl;
+        }
+    } else {
+        for (size_t i=0; i<header.size(); i++) {
+            params[header[i]] = values[i];
+        }
     }
+    
 
     return params;
 }
