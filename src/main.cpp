@@ -1,6 +1,7 @@
-#include "../include/lower_upper.hpp"
-#include "../include/forward_sub.hpp"
-#include "../include/back_sub.hpp"
+#include "black_scholes.hpp"
+#include "lower_upper.hpp"
+#include "forward_sub.hpp"
+#include "back_sub.hpp"
 
 #include <iostream>
 #include <iomanip>
@@ -38,6 +39,20 @@ void print_vector(const std::vector<T>& vec) {
 }
 
 int main() {
+    std::string filename = "/workspaces/Black_Scholes_Solver/option_chain.csv";
+
+    std::ifstream file(filename);
+    if (!file.is_open()) {
+        std::cerr << "Error opening file!" <<std::endl;
+        return 1;
+    }
+
+    std::cout << std::endl;
+    std::map<std::string, std::string> params = data_loader(file);
+    std::cout << std::endl;
+
+    file.close();
+
     // A = [1 1 0]
     //     [2 7 8]
     //     [0 3 5]

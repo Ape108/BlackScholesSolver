@@ -1,4 +1,4 @@
-#include "../include/forward_sub.hpp"
+#include "forward_sub.hpp"
 
 std::vector<float> forward_substitution(const std::vector<float>& lower, const std::vector<float>& b) {
     

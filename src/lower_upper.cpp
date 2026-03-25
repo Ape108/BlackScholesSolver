@@ -1,4 +1,4 @@
-#include "../include/lower_upper.hpp"
+#include "lower_upper.hpp"
 
 Decomposed lu_decomposition(const std::vector<float>& a, const std::vector<float>& b, const std::vector<float>& c) {
     
