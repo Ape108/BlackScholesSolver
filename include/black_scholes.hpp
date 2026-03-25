@@ -7,10 +7,6 @@
 #include <sstream>
 #include <iostream>
 
-// I'll write a data loader to grab the inputs from the CSV 
-// Then I will discretize the grid,
-// and initialize the boundary conditions.
-
 /// @brief Loads key-value pairs from a CSV file into a map.
 /// @details Parses the CSV file assuming the first row contains column headers
 ///          and the second row contains corresponding values. Each header becomes
@@ -21,3 +17,20 @@
 /// @throws std::runtime_error If the CSV has fewer than 2 rows or if the data row
 ///         has fewer columns than the header row.
 std::map<std::string, std::string> data_loader(std::ifstream &file, const bool& print=false);
+
+struct GridParams {
+    float price_ceiling; // Max price to model (theoretical price --> infinity, ceiling for computation)
+    float time_to_maturity;
+    size_t num_price_steps; // determines δS
+    size_t num_time_steps; // determines δT 
+
+};  
+
+struct MarketParams {
+    float volatility;
+    float risk_free_interest;
+    float strike_price;
+};
+
+// Calculates the diagonal coefficients
+std::vector<std::vector<float>> formulate_black_scholes(const GridParams& grid, const MarketParams& market);

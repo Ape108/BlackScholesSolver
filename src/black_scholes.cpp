@@ -43,3 +43,7 @@ std::map<std::string, std::string> data_loader(std::ifstream &file, const bool& 
 
     return params;
 }
+
+std::vector<std::vector<float>> formulate_black_scholes(const GridParams& grid, const MarketParams& market) {
+    
+}
