@@ -6,6 +6,9 @@
 #include <fstream> 
 #include <sstream>
 #include <iostream>
+#include <stdexcept>
+#include <cmath>
+
 
 /// @brief Loads key-value pairs from a CSV file into a map.
 /// @details Parses the CSV file assuming the first row contains column headers
@@ -32,5 +35,22 @@ struct MarketParams {
     float strike_price;
 };
 
-// Calculates the diagonal coefficients
-std::vector<std::vector<float>> formulate_black_scholes(const GridParams& grid, const MarketParams& market);
+struct Coefficients {
+    float alpha;
+    float beta;
+    float gamma;
+};
+
+
+
+Coefficients calculate_coeffs(const float& vol, const float& r, const float& time_to_maturity, const size_t& time_steps, const size_t& i);
+
+std::vector<float> evaluate_rhs(
+    const std::vector<float>& V_known, // Current known prices (size M + 1)
+    const std::vector<float>& alpha,   // Pre-calculated coefficients
+    const std::vector<float>& beta,
+    const std::vector<float>& gamma,
+    float V_bound_lower_j, float V_bound_lower_j_plus_1,
+    float V_bound_upper_j, float V_bound_upper_j_plus_1);
+
+std::vector<float> formulate_black_scholes(const GridParams& grid, const MarketParams& market);
