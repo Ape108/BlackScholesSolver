@@ -44,3 +44,5 @@
 
 build_dir
 .venv
+
+__pycache__
