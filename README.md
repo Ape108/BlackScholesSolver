@@ -39,8 +39,10 @@ V = bs_solver.formulate_black_scholes(grid, market)
 
 ## References
 
-Crank-Nicolson & Black Scholes:<br>
-https://antonismolski.medium.com/crank-nicholson-with-black-scholes-with-code-a27c0df17555
+SkanCity Academy. (2023, October 6). 🟢05 - Thomas Algorithm for Solving Tri-diagonal Matrix Systems [Video]. YouTube. https://www.youtube.com/watch?v=vzqwV-REmkw
 
-Thomas Algorithm:<br>
-https://www.youtube.com/watch?v=vzqwV-REmkw
+Smolski, A. (2023, December 30). Crank-Nicholson (Finite Difference) with Black-Scholes (with code). Medium. https://antonismolski.medium.com/crank-nicholson-with-black-scholes-with-code-a27c0df17555
+
+Zientziateka. (2019, May 31). Matrix representation of the Crank-Nicholson method for the Black-Scholes equation [Video]. YouTube. https://youtu.be/5mp-2zqo6hY?si=rUIu-qep44Q8UE0L
+
+Zientziateka. (2019, May 31). The Crank-Nicholson method for the Black-Scholes equation [Video]. YouTube. https://youtu.be/XHa81xxpj6I?si=ftj2lmpp0gn7GNto
