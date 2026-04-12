@@ -39,17 +39,17 @@ struct Coefficients {
 /// @return A map containing header-value pairs from the CSV file.
 /// @throws std::runtime_error If the CSV has fewer than 2 rows or if the data row
 ///         has fewer columns than the header row.
-std::map<std::string, std::string> data_loader(std::ifstream &file, const bool& print=false);
+std::map<std::string, std::string> data_loader(std::ifstream &file, bool print=false);
 
 std::map<std::string, std::string> open_file(const std::string& filename);
 
 double price_option(
     std::vector<double>& V, 
     const size_t& num_price_steps,
-    std::map<std::string, std::string>& params
+    const std::map<std::string, std::string>& params
 );
 
-void print_option_diff(const double& option_price, std::map<std::string, std::string>& params);
+void print_option_diff(const double& option_price, const std::map<std::string, std::string>& params);
 
 
 Coefficients calculate_coeffs(
@@ -73,5 +73,5 @@ std::vector<double> formulate_black_scholes(const GridParams& grid, const Market
 std::vector<double> evaluate_system(
     const size_t& num_time_steps, 
     const size_t& num_price_steps, 
-    std::map<std::string, std::string>& params
+    const std::map<std::string, std::string>& params
 );

@@ -2,7 +2,7 @@
 #include "linear_algebra.hpp"
 
 
-std::map<std::string, std::string> data_loader(std::ifstream &file, const bool& print) {
+std::map<std::string, std::string> data_loader(std::ifstream &file, bool print) {
     
     std::string line;
     std::vector<std::vector<std::string>> rows;
@@ -63,12 +63,12 @@ std::map<std::string, std::string> open_file(const std::string& filename) {
 double price_option(
     std::vector<double>& V, 
     const size_t& num_price_steps,
-    std::map<std::string, std::string>& params
+    const std::map<std::string, std::string>& params
 ) {
 
-    double current_price = std::stof(params["current_price"]);
+    double current_price = std::stod(params.at("current_price"));
     // Extracting the specific option price
-    double price_ceiling = std::stof(params["strike_price"]) * 2.0;
+    double price_ceiling = std::stod(params.at("strike_price")) * 2.0;
     
     double delta_S = price_ceiling / num_price_steps;
 
@@ -89,9 +89,9 @@ double price_option(
     return option_price;
 }
 
-void print_option_diff(const double& option_price, std::map<std::string, std::string>& params) {
-    double actual_price = stof(params["actual_price"]);
-    double underlier_price = std::stof(params["current_price"]);
+void print_option_diff(const double& option_price, const std::map<std::string, std::string>& params) {
+    double actual_price = std::stod(params.at("actual_price"));
+    double underlier_price = std::stod(params.at("current_price"));
 
     std::cout << "\n=========================================" << std::endl;
     std::cout << " Underlier Price:   $" << underlier_price << std::endl;
@@ -219,19 +219,19 @@ std::vector<double> formulate_black_scholes(const GridParams& grid, const Market
 std::vector<double> evaluate_system(
     const size_t& num_time_steps, 
     const size_t& num_price_steps, 
-    std::map<std::string, std::string>& params
+    const std::map<std::string, std::string>& params
 ) {
     GridParams grid; 
     MarketParams market;
 
     grid.num_price_steps = num_price_steps;
     grid.num_time_steps = num_time_steps; 
-    grid.price_ceiling = std::stof(params["strike_price"]) * 2.0;
-    grid.time_to_maturity = std::stof(params["T"]);
+    grid.price_ceiling = std::stod(params.at("strike_price")) * 2.0;
+    grid.time_to_maturity = std::stod(params.at("T"));
 
-    market.risk_free_interest = std::stof(params["risk_free_rate"]);
-    market.strike_price = std::stof(params["strike_price"]);
-    market.volatility = std::stof(params["implied_vol"]);
+    market.risk_free_interest = std::stod(params.at("risk_free_rate"));
+    market.strike_price = std::stod(params.at("strike_price"));
+    market.volatility = std::stod(params.at("implied_vol"));
 
     std::vector<double> V = formulate_black_scholes(grid, market);
 
