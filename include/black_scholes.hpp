@@ -11,23 +11,23 @@
 #include <iomanip>
 
 struct GridParams {
-    float price_ceiling;
-    float time_to_maturity;
+    double price_ceiling;
+    double time_to_maturity;
     size_t num_price_steps; // determines δS
     size_t num_time_steps; // determines δT 
 
 };  
 
 struct MarketParams {
-    float volatility;
-    float risk_free_interest;
-    float strike_price;
+    double volatility;
+    double risk_free_interest;
+    double strike_price;
 };
 
 struct Coefficients {
-    float alpha;
-    float beta;
-    float gamma;
+    double alpha;
+    double beta;
+    double gamma;
 };
 
 /// @brief Loads key-value pairs from a CSV file into a map.
@@ -43,34 +43,34 @@ std::map<std::string, std::string> data_loader(std::ifstream &file, const bool& 
 
 std::map<std::string, std::string> open_file(const std::string& filename);
 
-float price_option(
-    std::vector<float>& V, 
+double price_option(
+    std::vector<double>& V, 
     const size_t& num_price_steps,
     std::map<std::string, std::string>& params
 );
 
-void print_option_diff(const float& option_price, std::map<std::string, std::string>& params);
+void print_option_diff(const double& option_price, std::map<std::string, std::string>& params);
 
 
 Coefficients calculate_coeffs(
-    const float& vol, 
-    const float& r, 
-    const float& time_to_maturity, 
+    const double& vol, 
+    const double& r, 
+    const double& time_to_maturity, 
     const size_t& time_steps, 
     const size_t& i
 );
 
-std::vector<float> evaluate_rhs(
-    const std::vector<float>& V_known,
-    const std::vector<float>& alpha,   
-    const std::vector<float>& beta,
-    const std::vector<float>& gamma,
-    float V_bound_lower_j, float V_bound_lower_j_plus_1,
-    float V_bound_upper_j, float V_bound_upper_j_plus_1);
+std::vector<double> evaluate_rhs(
+    const std::vector<double>& V_known,
+    const std::vector<double>& alpha,   
+    const std::vector<double>& beta,
+    const std::vector<double>& gamma,
+    double V_bound_lower_j, double V_bound_lower_j_plus_1,
+    double V_bound_upper_j, double V_bound_upper_j_plus_1);
 
-std::vector<float> formulate_black_scholes(const GridParams& grid, const MarketParams& market);
+std::vector<double> formulate_black_scholes(const GridParams& grid, const MarketParams& market);
 
-std::vector<float> evaluate_system(
+std::vector<double> evaluate_system(
     const size_t& num_time_steps, 
     const size_t& num_price_steps, 
     std::map<std::string, std::string>& params

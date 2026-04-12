@@ -60,8 +60,8 @@ x will be the solution vector to the original tridiagonal linear system.
 
 // Struct to hold the values of L and U. 
 struct Decomposed {
-    std::vector<float> lower;
-    std::vector<float> upper;
+    std::vector<double> lower;
+    std::vector<double> upper;
 };
 
 /// @brief Performs LU decomposition on a tridiagonal matrix.
@@ -69,17 +69,17 @@ struct Decomposed {
 /// @param b The input matrix upper-diagonal values (Flattened into a 1D vector).
 /// @param c The input matrix lower-diagonal values (Flattened into a 1D vector).
 /// @return A 'Decomposed' struct containing an upper and lower matrix.
-Decomposed lu_decomposition(const std::vector<float>& a, const std::vector<float>& b, const std::vector<float>& c);
+Decomposed lu_decomposition(const std::vector<double>& a, const std::vector<double>& b, const std::vector<double>& c);
 
 /// @brief Solves a system of linear equations using forward substitution.
 /// @param lower The lower triangular matrix (flattened into a 1D vector).
 /// @param b The right-hand side constant vector.
 /// @return A vector containing the solution to the system.
-std::vector<float> forward_substitution(const std::vector<float>& lower, const std::vector<float>& b);
+std::vector<double> forward_substitution(const std::vector<double>& lower, const std::vector<double>& b);
 
 /// @brief Solves a system of linear equations using backward substitution.
 /// @param u The main diagonal of the upper triangular matrix (flattened into a 1D vector).
 /// @param b The upper diagonal of the upper triangular matrix (flattened into a 1D vector).
 /// @param y The right-hand side constant vector.
 /// @return A vector containing the solution to the system.
-std::vector<float> backward_substitution(const std::vector<float>& u, const std::vector<float>& b, const std::vector<float>& y);
+std::vector<double> backward_substitution(const std::vector<double>& u, const std::vector<double>& b, const std::vector<double>& y);

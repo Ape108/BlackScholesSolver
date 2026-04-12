@@ -60,38 +60,38 @@ std::map<std::string, std::string> open_file(const std::string& filename) {
 
 
 
-float price_option(
-    std::vector<float>& V, 
+double price_option(
+    std::vector<double>& V, 
     const size_t& num_price_steps,
     std::map<std::string, std::string>& params
 ) {
 
-    float current_price = std::stof(params["current_price"]);
+    double current_price = std::stof(params["current_price"]);
     // Extracting the specific option price
-    float price_ceiling = std::stof(params["strike_price"]) * 2.0;
+    double price_ceiling = std::stof(params["strike_price"]) * 2.0;
     
-    float delta_S = price_ceiling / num_price_steps;
+    double delta_S = price_ceiling / num_price_steps;
 
     // Find where our current price lands on the grid
-    float exact_idx = current_price / delta_S;
+    double exact_idx = current_price / delta_S;
 
     // Get the integer indices immediately below and above it
     size_t lower_idx = static_cast<size_t>(std::floor(exact_idx));
     size_t upper_idx = lower_idx + 1;
 
     // Calculate how close the price is to the upper node (weighting)
-    float weight_upper = exact_idx - lower_idx;
-    float weight_lower = 1.0f - weight_upper;
+    double weight_upper = exact_idx - lower_idx;
+    double weight_lower = 1.0 - weight_upper;
 
     // Interpolate the exact option price
-    float option_price = (V[lower_idx] * weight_lower) + (V[upper_idx] * weight_upper);
+    double option_price = (V[lower_idx] * weight_lower) + (V[upper_idx] * weight_upper);
     
     return option_price;
 }
 
-void print_option_diff(const float& option_price, std::map<std::string, std::string>& params) {
-    float actual_price = stof(params["actual_price"]);
-    float underlier_price = std::stof(params["current_price"]);
+void print_option_diff(const double& option_price, std::map<std::string, std::string>& params) {
+    double actual_price = stof(params["actual_price"]);
+    double underlier_price = std::stof(params["current_price"]);
 
     std::cout << "\n=========================================" << std::endl;
     std::cout << " Underlier Price:   $" << underlier_price << std::endl;
@@ -101,14 +101,14 @@ void print_option_diff(const float& option_price, std::map<std::string, std::str
 }
 
 Coefficients calculate_coeffs(
-    const float& vol, 
-    const float& r, 
-    const float& time_to_maturity, 
+    const double& vol, 
+    const double& r, 
+    const double& time_to_maturity, 
     const size_t& time_steps, 
     const size_t& i
 ) {
     Coefficients coeffs;
-    float delta_t = time_to_maturity / time_steps;
+    double delta_t = time_to_maturity / time_steps;
 
     coeffs.alpha = (delta_t / 4.0) * (std::pow(vol, 2.0) * std::pow(i, 2.0) - r * i);
     coeffs.beta = (-delta_t / 2.0) * (std::pow(vol, 2.0) * std::pow(i, 2.0) + r);
@@ -117,22 +117,22 @@ Coefficients calculate_coeffs(
     return coeffs;
 }
 
-std::vector<float> evaluate_rhs(
-    const std::vector<float>& V_known, // Current known prices (size M + 1)
-    const std::vector<float>& alpha,   // Pre-calculated coefficients
-    const std::vector<float>& beta,
-    const std::vector<float>& gamma,
-    float V_bound_lower_j, float V_bound_lower_j_plus_1,
-    float V_bound_upper_j, float V_bound_upper_j_plus_1) 
+std::vector<double> evaluate_rhs(
+    const std::vector<double>& V_known, // Current known prices (size M + 1)
+    const std::vector<double>& alpha,   // Pre-calculated coefficients
+    const std::vector<double>& beta,
+    const std::vector<double>& gamma,
+    double V_bound_lower_j, double V_bound_lower_j_plus_1,
+    double V_bound_upper_j, double V_bound_upper_j_plus_1) 
 {
     size_t M = V_known.size() - 1; 
-    std::vector<float> rhs(M - 1, 0.0f); // Matrix size is M-1
+    std::vector<double> rhs(M - 1, 0.0); // Matrix size is M-1
 
     // Loop through the internal grid nodes (i = 1 to M-1)
     for (size_t i = 1; i <= M - 1; ++i) {
         size_t rhs_idx = i - 1; // rhs is 0-indexed, grid is 1-indexed
 
-        rhs[rhs_idx] = (1.0f + beta[i]) * V_known[i];
+        rhs[rhs_idx] = (1.0 + beta[i]) * V_known[i];
         
         // Add adjacent internal nodes (avoiding boundary out-of-bounds)
         if (i > 1)   rhs[rhs_idx] += alpha[i] * V_known[i - 1];
@@ -146,14 +146,14 @@ std::vector<float> evaluate_rhs(
     return rhs;
 }
 
-std::vector<float> formulate_black_scholes(const GridParams& grid, const MarketParams& market) {
+std::vector<double> formulate_black_scholes(const GridParams& grid, const MarketParams& market) {
     size_t M = grid.num_price_steps;
     size_t N = grid.num_time_steps;
 
     // 1. Pre-calculate coefficients for i = 0 to M
-    std::vector<float> alpha(M + 1, 0.0f);
-    std::vector<float> beta(M + 1, 0.0f);
-    std::vector<float> gamma(M + 1, 0.0f);
+    std::vector<double> alpha(M + 1, 0.0);
+    std::vector<double> beta(M + 1, 0.0);
+    std::vector<double> gamma(M + 1, 0.0);
 
     for (size_t i = 0; i <= M; ++i) {
         Coefficients c = calculate_coeffs(market.volatility, market.risk_free_interest, grid.time_to_maturity, N, i);
@@ -163,12 +163,12 @@ std::vector<float> formulate_black_scholes(const GridParams& grid, const MarketP
     }
     
     // 2. Build the left-hand Matrix A (Tridiagonal)
-    std::vector<float> a_diag(M - 1); // Main diagonal: (1 - beta_i)
-    std::vector<float> b_diag(M - 2); // Upper diagonal: -gamma_i
-    std::vector<float> c_diag(M - 2); // Lower diagonal: -alpha_i
+    std::vector<double> a_diag(M - 1); // Main diagonal: (1 - beta_i)
+    std::vector<double> b_diag(M - 2); // Upper diagonal: -gamma_i
+    std::vector<double> c_diag(M - 2); // Lower diagonal: -alpha_i
 
     for (size_t i = 1; i <= M - 1; ++i) {
-        a_diag[i - 1] = 1.0f - beta[i];
+        a_diag[i - 1] = 1.0 - beta[i];
         if (i < M - 1) b_diag[i - 1] = -gamma[i];
         if (i > 1)     c_diag[i - 2] = -alpha[i];
     } 
@@ -177,33 +177,33 @@ std::vector<float> formulate_black_scholes(const GridParams& grid, const MarketP
     Decomposed LU = lu_decomposition(a_diag, b_diag, c_diag);
 
     // 4. Set up the terminal payoff at expiration (j = N)
-    float delta_S = grid.price_ceiling / M;
-    std::vector<float> V(M + 1, 0.0f);
+    double delta_S = grid.price_ceiling / M;
+    std::vector<double> V(M + 1, 0.0);
     for (size_t i = 0; i <= M; ++i) {
-        float S_i = i * delta_S;
-        V[i] = std::max(0.0f, S_i - market.strike_price); // Assuming Call Option
+        double S_i = i * delta_S;
+        V[i] = std::max(0.0, S_i - market.strike_price); // Assuming Call Option
     }
 
     // 5. Time-stepping loop (backward induction)
-    float delta_t = grid.time_to_maturity / N;
+    double delta_t = grid.time_to_maturity / N;
 
     for (int j = N - 1; j >= 0; --j) {
-        float t_j = j * delta_t;
-        float t_j_plus_1 = (j + 1) * delta_t;
+        double t_j = j * delta_t;
+        double t_j_plus_1 = (j + 1) * delta_t;
 
         // Calculate Call Option boundaries for current and future step
-        float V_lower_j = 0.0f;
-        float V_lower_j1 = 0.0f;
+        double V_lower_j = 0.0;
+        double V_lower_j1 = 0.0;
 
-        float V_upper_j = grid.price_ceiling - market.strike_price * std::exp(-market.risk_free_interest * (grid.time_to_maturity - t_j));
-        float V_upper_j1 = grid.price_ceiling - market.strike_price * std::exp(-market.risk_free_interest * (grid.time_to_maturity - t_j_plus_1));
+        double V_upper_j = grid.price_ceiling - market.strike_price * std::exp(-market.risk_free_interest * (grid.time_to_maturity - t_j));
+        double V_upper_j1 = grid.price_ceiling - market.strike_price * std::exp(-market.risk_free_interest * (grid.time_to_maturity - t_j_plus_1));
 
         // Evaluate RHS
-        std::vector<float> rhs = evaluate_rhs(V, alpha, beta, gamma, V_lower_j, V_lower_j1, V_upper_j, V_upper_j1);
+        std::vector<double> rhs = evaluate_rhs(V, alpha, beta, gamma, V_lower_j, V_lower_j1, V_upper_j, V_upper_j1);
 
         // Solve the system using forward and backward substitution
-        std::vector<float> y = forward_substitution(LU.lower, rhs);
-        std::vector<float> x = backward_substitution(LU.upper, b_diag, y);
+        std::vector<double> y = forward_substitution(LU.lower, rhs);
+        std::vector<double> x = backward_substitution(LU.upper, b_diag, y);
 
         // Update V for the next iteration: Internal nodes become x, boundaries become deterministic equations
         for (size_t i = 1; i <= M - 1; ++i) {
@@ -216,7 +216,7 @@ std::vector<float> formulate_black_scholes(const GridParams& grid, const MarketP
     return V; // This vector contains the present value of the option across all price steps.
 }
 
-std::vector<float> evaluate_system(
+std::vector<double> evaluate_system(
     const size_t& num_time_steps, 
     const size_t& num_price_steps, 
     std::map<std::string, std::string>& params
@@ -233,7 +233,7 @@ std::vector<float> evaluate_system(
     market.strike_price = std::stof(params["strike_price"]);
     market.volatility = std::stof(params["implied_vol"]);
 
-    std::vector<float> V = formulate_black_scholes(grid, market);
+    std::vector<double> V = formulate_black_scholes(grid, market);
 
     return V;
 }

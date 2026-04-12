@@ -10,9 +10,9 @@ int main() {
 
     try {
         std::map<std::string, std::string> params = open_file(filename);
-        std::vector<float> solution_vector = evaluate_system(NUM_TIMESTEPS, NUM_PRICESTEPS, params);
+        std::vector<double> solution_vector = evaluate_system(NUM_TIMESTEPS, NUM_PRICESTEPS, params);
         // Run Black-Scholes Pricing Calculation
-        float option_price = price_option(solution_vector, NUM_PRICESTEPS, params);
+        double option_price = price_option(solution_vector, NUM_PRICESTEPS, params);
         print_option_diff(option_price, params);
 
     } 
