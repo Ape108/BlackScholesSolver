@@ -41,3 +41,23 @@ target_link_libraries(
 
 include(GoogleTest)
 gtest_discover_tests(all_tests)
+
+
+# Fetch pybind11
+FetchContent_Declare(
+  pybind11
+  GIT_REPOSITORY https://github.com/pybind/pybind11.git
+  GIT_TAG        v2.11.1
+)
+FetchContent_MakeAvailable(pybind11)
+
+# Tell pybind11 to build a Python extension module named 'bs_solver'
+# We include the binding file AND the core library files it depends on
+pybind11_add_module(bs_solver 
+    src/bindings.cpp 
+    src/linear_algebra.cpp 
+    src/black_scholes.cpp
+)
+
+# Ensure the module can find your headers
+target_include_directories(bs_solver PRIVATE ${CMAKE_SOURCE_DIR}/include)
