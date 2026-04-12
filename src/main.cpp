@@ -3,7 +3,7 @@
 
 int main() {
 
-    std::string filename = "/workspaces/Black_Scholes_Solver/option_chain.csv";
+    std::string filename = "option_chain.csv";
     
     size_t NUM_PRICESTEPS = 760;
     size_t NUM_TIMESTEPS = 200;
