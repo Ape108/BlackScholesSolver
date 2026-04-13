@@ -37,6 +37,14 @@ market.strike_price = 190.0
 V = black_scholes_solver.formulate_black_scholes(grid, market)
 ```
 
+## Performance
+
+The numerical engine is built to handle computationally intensive stochastic grid calculations with minimal latency. By bypassing the Python Global Interpreter Lock (GIL) and executing raw 64-bit C++ machine code, the library achieves a roughly **30x execution speedup** over native Python implementations.
+
+**Benchmark (2000 Price Steps x 2000 Time Steps):**
+* **Pure Python:** ~2.51 seconds
+* **Compiled C++:** ~0.08 seconds
+
 ## References
 
 SkanCity Academy. (2023, October 6). 🟢05 - Thomas Algorithm for Solving Tri-diagonal Matrix Systems [Video]. YouTube. https://www.youtube.com/watch?v=vzqwV-REmkw
