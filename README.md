@@ -31,6 +31,7 @@ market = black_scholes_solver.MarketParams()
 market.volatility = 0.2754
 market.risk_free_interest = 0.0359
 market.strike_price = 190.0
+market.option_type = black_scholes_solver.OptionType.Call
 
 # 3. Solve the PDE (Executes natively in C++)
 # Returns a Python list containing the option value at every price step
