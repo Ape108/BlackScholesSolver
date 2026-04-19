@@ -48,6 +48,8 @@ The numerical engine is built to handle computationally intensive stochastic gri
 
 ## References
 
+Brennan, M. J., & Schwartz, E. S. (1977). The valuation of American put options. The Journal of Finance, 32(2), 449–462. https://www.jstor.org/stable/2326779
+
 SkanCity Academy. (2023, October 6). 🟢05 - Thomas Algorithm for Solving Tri-diagonal Matrix Systems [Video]. YouTube. https://www.youtube.com/watch?v=vzqwV-REmkw
 
 Smolski, A. (2023, December 30). Crank-Nicholson (Finite Difference) with Black-Scholes (with code). Medium. https://antonismolski.medium.com/crank-nicholson-with-black-scholes-with-code-a27c0df17555
