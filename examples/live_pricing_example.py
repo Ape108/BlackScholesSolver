@@ -44,8 +44,12 @@ def main():
     # Calculate time to maturity (T) in years
     expiry_date = datetime.strptime(target_expiry, '%Y-%m-%d').replace(tzinfo=timezone.utc)
     today = datetime.now(timezone.utc)
-    days_to_expiry = (expiry_date - today).days
-    T = round(max(days_to_expiry / 365.0, 1e-5), 4) # Prevent division by zero if it expires today
+    # Calculate exact fractional days down to the second
+    expiry_exact = expiry_date.replace(hour=20, minute=0, second=0)
+    fractional_days = (expiry_exact - today).total_seconds() / 86400.0
+    
+    # Standardize to 365 calendar days
+    T = round(max(fractional_days / 365.0, 1e-5), 6)
 
     print(f"--- Extracted Parameters ---")
     print(f"S0 (Price): ${current_price:.2f} | K (Strike): ${strike_price} | T (Years): {T:.4f}")

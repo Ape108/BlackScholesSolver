@@ -3,8 +3,9 @@ import time
 
 import black_scholes_solver
 
-
-# Pure Python Implementation - Baseline
+# =========================================================================
+# 1. PURE PYTHON IMPLEMENTATION (The Baseline)
+# =========================================================================
 
 def lu_decomposition(a, b, c):
     n = len(a)
@@ -39,11 +40,14 @@ def backward_substitution(u, b, y):
     stack.reverse()
     return stack
 
-def calculate_coeffs(vol, r, time_to_maturity, time_steps, i):
+# UPDATED: Added 'q' (dividend yield) and generalized drift
+def calculate_coeffs(vol, r, q, time_to_maturity, time_steps, i):
     delta_t = time_to_maturity / time_steps
-    alpha = (delta_t / 4.0) * ((vol**2) * (i**2) - r * i)
+    drift = r - q
+    
+    alpha = (delta_t / 4.0) * ((vol**2) * (i**2) - drift * i)
     beta = (-delta_t / 2.0) * ((vol**2) * (i**2) + r)
-    gamma = (delta_t / 4.0) * ((vol**2) * (i**2) + r * i)
+    gamma = (delta_t / 4.0) * ((vol**2) * (i**2) + drift * i)
     return alpha, beta, gamma
 
 def evaluate_rhs(V_known, alpha, beta, gamma, V_lower_j, V_lower_j1, V_upper_j, V_upper_j1):
@@ -63,7 +67,8 @@ def evaluate_rhs(V_known, alpha, beta, gamma, V_lower_j, V_lower_j1, V_upper_j, 
     rhs[M - 2] += gamma[M - 1] * (V_upper_j + V_upper_j1)
     return rhs
 
-def naive_formulate_black_scholes(price_ceiling, time_to_maturity, num_price_steps, num_time_steps, vol, r, strike):
+# UPDATED: Added 'q' and 'option_type'
+def naive_formulate_black_scholes(price_ceiling, time_to_maturity, num_price_steps, num_time_steps, vol, r, q, strike, option_type):
     M = num_price_steps
     N = num_time_steps
 
@@ -72,7 +77,7 @@ def naive_formulate_black_scholes(price_ceiling, time_to_maturity, num_price_ste
     gamma = [0.0] * (M + 1)
 
     for i in range(M + 1):
-        a, b, g = calculate_coeffs(vol, r, time_to_maturity, N, i)
+        a, b, g = calculate_coeffs(vol, r, q, time_to_maturity, N, i)
         alpha[i] = a
         beta[i] = b
         gamma[i] = g
@@ -90,34 +95,53 @@ def naive_formulate_black_scholes(price_ceiling, time_to_maturity, num_price_ste
 
     delta_S = price_ceiling / M
     V = [0.0] * (M + 1)
+    
+    # UPDATED: Terminal Payoff handles Calls and Puts
     for i in range(M + 1):
         S_i = i * delta_S
-        V[i] = max(0.0, S_i - strike)
+        if option_type == 'Call':
+            V[i] = max(0.0, S_i - strike)
+        else:
+            V[i] = max(0.0, strike - S_i)
 
-    delta_t = time_to_maturity / N
-
+    # Time-stepping loop (backward induction)
     for j in range(N - 1, -1, -1):
-        t_j = j * delta_t
-        t_j_plus_1 = (j + 1) * delta_t
-
-        V_lower_j = 0.0
-        V_lower_j1 = 0.0
-
-        V_upper_j = price_ceiling - strike * math.exp(-r * (time_to_maturity - t_j))
-        V_upper_j1 = price_ceiling - strike * math.exp(-r * (time_to_maturity - t_j_plus_1))
+        
+        # UPDATED: American Boundary Conditions
+        if option_type == 'Call':
+            V_lower_j = 0.0
+            V_lower_j1 = 0.0
+            V_upper_j = price_ceiling - strike
+            V_upper_j1 = price_ceiling - strike
+        else:
+            V_lower_j = strike
+            V_lower_j1 = strike
+            V_upper_j = 0.0
+            V_upper_j1 = 0.0
 
         rhs = evaluate_rhs(V, alpha, beta, gamma, V_lower_j, V_lower_j1, V_upper_j, V_upper_j1)
         y = forward_substitution(lower, rhs)
         x = backward_substitution(upper, b_diag, y)
 
+        # UPDATED: Brennan-Schwartz American Early Exercise Constraint
         for i in range(1, M):
-            V[i] = x[i - 1]
+            S_i = i * delta_S
+            if option_type == 'Call':
+                intrinsic_value = max(0.0, S_i - strike)
+            else:
+                intrinsic_value = max(0.0, strike - S_i)
+                
+            V[i] = max(x[i - 1], intrinsic_value)
+            
         V[0] = V_lower_j
         V[M] = V_upper_j
 
     return V
 
-# Benchmark Race
+
+# =========================================================================
+# 2. BENCHMARK RACE
+# =========================================================================
 
 def run_benchmark():
     # Set expensive grid parameters to stress-test both engines
@@ -128,9 +152,10 @@ def run_benchmark():
     TIME_STEPS = 2000
     VOL = 0.25
     RATE = 0.05
+    DIV_YIELD = 0.015 # Added dividend yield parameter
     STRIKE = 200.0
 
-    print(f"Benchmarking Crank-Nicolson PDE Solver...")
+    print(f"Benchmarking Crank-Nicolson American PDE Solver...")
     print(f"Grid Size: {PRICE_STEPS} Price Steps x {TIME_STEPS} Time Steps")
     print(f"Running {ITERATIONS} iterations to calculate average latency...\n")
 
@@ -138,7 +163,10 @@ def run_benchmark():
     print("Running Pure Python Implementation...")
     py_start = time.perf_counter()
     for _ in range(ITERATIONS):
-        py_V = naive_formulate_black_scholes(PRICE_CEILING, TTM, PRICE_STEPS, TIME_STEPS, VOL, RATE, STRIKE)
+        # Passing DIV_YIELD and 'Call' as option type
+        py_V = naive_formulate_black_scholes(
+            PRICE_CEILING, TTM, PRICE_STEPS, TIME_STEPS, VOL, RATE, DIV_YIELD, STRIKE, 'Call'
+        )
     py_total = time.perf_counter() - py_start
     py_avg = py_total / ITERATIONS
     print(f"Python Average Execution Time: {py_avg:.5f} seconds\n")
@@ -154,8 +182,9 @@ def run_benchmark():
     market = black_scholes_solver.MarketParams()
     market.volatility = VOL
     market.risk_free_interest = RATE
+    market.dividend_yield = DIV_YIELD  # Updating the new struct property
     market.strike_price = STRIKE
-    market.option_type = black_scholes_solver.OptionType.Call
+    market.option_type = black_scholes_solver.OptionType.Call # Native Enum
 
     cpp_start = time.perf_counter()
     for _ in range(ITERATIONS):
